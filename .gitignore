@@ -1,3 +1,5 @@
-.idea/
 Common/target/
+
+.idea/
 *.iml
+*.iws
