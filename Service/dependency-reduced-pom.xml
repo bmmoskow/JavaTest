@@ -22,7 +22,7 @@
               <transformers>
                 <transformer />
                 <transformer>
-                  <mainClass>com.example.helloworld.HelloWorldApplication</mainClass>
+                  <mainClass>ben.math.distribution.DistributionApplication</mainClass>
                 </transformer>
               </transformers>
             </configuration>
