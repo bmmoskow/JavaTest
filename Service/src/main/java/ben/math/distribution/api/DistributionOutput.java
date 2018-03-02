@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DistributionOutput {
     private DistributionInput input;
-    private Double result;
+    private Double pdf;
 
     public DistributionOutput() {
         // Jackson deserialization
     }
 
-    public DistributionOutput(DistributionInput input, Double x) {
+    public DistributionOutput(DistributionInput input, Double pdf) {
         this.input = input;
-        this.result = x;
+        this.pdf = pdf;
     }
 
     @JsonProperty
@@ -21,7 +21,7 @@ public class DistributionOutput {
     }
 
     @JsonProperty
-    public Double getResult() {
-        return result;
+    public Double getPdf() {
+        return pdf;
     }
 }
