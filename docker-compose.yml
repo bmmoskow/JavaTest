@@ -1,0 +1,9 @@
+version: "2"
+
+services:
+  service:
+    image: bmmoskow/service
+    build: .
+    ports:
+      - "8000:8000"
+      - "8001:8001"

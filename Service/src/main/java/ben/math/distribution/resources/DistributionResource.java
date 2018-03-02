@@ -31,7 +31,7 @@ public class DistributionResource
 
     protected Double computeExponentialPdf(Double lambda, Double x) {
         Double pdf = lambda * exp(-lambda * x);
-        if (pdf == 0) {
+        if (pdf.equals(0.0)) {
             pdf = exp(log(lambda) - lambda * x);
         }
         return pdf;
