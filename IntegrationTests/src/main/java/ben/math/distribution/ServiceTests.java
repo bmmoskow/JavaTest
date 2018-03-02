@@ -5,10 +5,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,10 +21,16 @@ import com.mashape.unirest.http.HttpResponse;
  */
 public class ServiceTests {
     private static ObjectMapper mapper = new ObjectMapper();
+    private static String servicePath;
+    private static int servicePort;
 
     @BeforeClass
-    public static void beforeClass() {
+    @Parameters({"servicePath", "servicePort"})
+    public static void beforeClass(String servicePath, int servicePort) {
         Unirest.setDefaultHeader("CONTENT-TYPE", "application/json");
+
+        ServiceTests.servicePath = servicePath;
+        ServiceTests.servicePort = servicePort;
     }
 
     @AfterClass
@@ -53,7 +56,7 @@ public class ServiceTests {
     @Test(dataProvider = "pdfData")
     public void baseline(Double lambda, Double x, Double pdf) throws UnirestException, IOException {
         String jsonBody = "{ \"lambda\" : " + lambda + ", \"x\" : " + x + " }";
-        HttpResponse response = Unirest.post("http://localhost:9000/distribution/exponential/pdf").body(jsonBody).asJson();
+        HttpResponse response = Unirest.post(servicePath + ":" + servicePort + "/distribution/exponential/pdf").body(jsonBody).asJson();
 
         Assert.assertEquals(response.getStatus(), 200);
         Map<String, Object> responseBody = mapper.readValue(response.getBody().toString(), HashMap.class);
