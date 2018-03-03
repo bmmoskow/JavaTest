@@ -88,10 +88,24 @@
                 <artifactId>replacer</artifactId>
                 <executions>
                     <execution>
+                        <id>replace values in ${testng.file}</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>replace</goal>
                         </goals>
+                        <configuration>
+                            <file>${testng.file}</file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>replaces values in ${docker.compose.ports}</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <file>${docker.compose.ports}</file>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
@@ -125,7 +139,7 @@
                                 <argument>-f</argument>
                                 <argument>${project.basedir}/../docker-compose.yml</argument>
                                 <argument>-f</argument>
-                                <argument>${project.basedir}/target/classes/docker-compose-ports.yml</argument>
+                                <argument>${docker.compose.ports}</argument>
                                 <argument>up</argument>
                                 <argument>--build</argument>
                                 <argument>-d</argument>
@@ -144,7 +158,7 @@
                                 <argument>-f</argument>
                                 <argument>${project.basedir}/../docker-compose.yml</argument>
                                 <argument>-f</argument>
-                                <argument>${project.basedir}/target/classes/docker-compose-ports.yml</argument>
+                                <argument>${docker.compose.ports}</argument>
                                 <argument>down</argument>
                             </arguments>
                         </configuration>
@@ -184,6 +198,7 @@
 
     <properties>
         <testng.file>${project.basedir}/target/classes/testng.xml</testng.file>
+        <docker.compose.ports>${project.basedir}/target/classes/docker-compose-ports.yml</docker.compose.ports>
     </properties>
 
 </project>
