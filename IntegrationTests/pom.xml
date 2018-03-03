@@ -84,12 +84,32 @@
                 <!--</configuration>-->
             <!--</plugin>-->
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>reserve-network-port</id>
+                        <goals>
+                            <goal>reserve-network-port</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <portNames>
+                                <portName>service.port</portName>
+                                <portName>service.health.port</portName>
+                            </portNames>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
                 <artifactId>replacer</artifactId>
                 <executions>
                     <execution>
                         <id>replace values in ${testng.file}</id>
-                        <phase>prepare-package</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>replace</goal>
                         </goals>
@@ -99,7 +119,7 @@
                     </execution>
                     <execution>
                         <id>replaces values in ${docker.compose.ports}</id>
-                        <phase>prepare-package</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>replace</goal>
                         </goals>
@@ -114,11 +134,11 @@
                     <replacements>
                         <replacement>
                             <token>%SERVICE_PORT%</token>
-                            <value>9000</value>
+                            <value>${service.port}</value>
                         </replacement>
                         <replacement>
                             <token>%SERVICE_HEALTH_PORT%</token>
-                            <value>9001</value>
+                            <value>${service.health.port}</value>
                         </replacement>
                     </replacements>
                 </configuration>
