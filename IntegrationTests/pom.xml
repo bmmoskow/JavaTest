@@ -99,7 +99,7 @@
                                 <argument>-f</argument>
                                 <argument>${project.basedir}/../docker-compose.yml</argument>
                                 <argument>-f</argument>
-                                <argument>${project.basedir}/../docker-compose-ports.yml</argument>
+                                <argument>${project.basedir}/target/classes/docker-compose-ports.yml</argument>
                                 <argument>up</argument>
                                 <argument>--build</argument>
                                 <argument>-d</argument>
@@ -118,7 +118,7 @@
                                 <argument>-f</argument>
                                 <argument>${project.basedir}/../docker-compose.yml</argument>
                                 <argument>-f</argument>
-                                <argument>${project.basedir}/../docker-compose-ports.yml</argument>
+                                <argument>${project.basedir}/target/classes/docker-compose-ports.yml</argument>
                                 <argument>down</argument>
                             </arguments>
                         </configuration>

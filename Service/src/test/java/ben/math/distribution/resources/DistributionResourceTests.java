@@ -31,7 +31,7 @@ public class DistributionResourceTests {
         List<Object> pdfData = mapper.readValue(new File("src/test/resources/pdfData.json"), ArrayList.class);
         Object[][] pdfDataObject = new Object[pdfData.size()][3];
         for (int i = 0; i < pdfData.size(); i++) {
-            Map<String, Object> pdfDataPoint1 = (HashMap)pdfData.get(0);
+            Map<String, Object> pdfDataPoint1 = (HashMap)pdfData.get(i);
             pdfDataObject[i][0] = pdfDataPoint1.get("lambda");
             pdfDataObject[i][1] = pdfDataPoint1.get("x");
             pdfDataObject[i][2] = pdfDataPoint1.get("pdf");
