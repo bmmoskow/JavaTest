@@ -84,6 +84,32 @@
                 <!--</configuration>-->
             <!--</plugin>-->
             <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <ignoreMissingFile>false</ignoreMissingFile>
+                    <file>${testng.file}</file>
+                    <replacements>
+                        <replacement>
+                            <token>%SERVICE_PORT%</token>
+                            <value>9000</value>
+                        </replacement>
+                        <replacement>
+                            <token>%SERVICE_HEALTH_PORT%</token>
+                            <value>9001</value>
+                        </replacement>
+                    </replacements>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
@@ -141,7 +167,7 @@
                                 <goal>verify</goal>
                             </goals>
                             <suiteXmlFiles>
-                                <suiteXmlFile>src/main/resources/testng.xml</suiteXmlFile>
+                                <suiteXmlFile>${testng.file}</suiteXmlFile>
                             </suiteXmlFiles>
                         </configuration>
                     </execution>
@@ -155,5 +181,9 @@
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <testng.file>${project.basedir}/target/classes/testng.xml</testng.file>
+    </properties>
 
 </project>
