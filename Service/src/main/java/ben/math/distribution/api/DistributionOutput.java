@@ -1,9 +1,13 @@
 package ben.math.distribution.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 public class DistributionOutput {
+    @NotEmpty
     private DistributionInput input;
+
+    @NotEmpty
     private Double pdf;
 
     public DistributionOutput() {

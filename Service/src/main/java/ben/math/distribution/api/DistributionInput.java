@@ -1,9 +1,13 @@
 package ben.math.distribution.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 public class DistributionInput {
+    @NotEmpty
     private Double lambda;
+
+    @NotEmpty
     private Double x;
 
     public DistributionInput() {
