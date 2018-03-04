@@ -6,6 +6,7 @@ progress.  This document explains the implmented
 features and outlines the planned updates.
 
 ##Quick Start
+
 Prerequisites are [java](https://java.com/en/download/), 
 [maven](https://maven.apache.org/download.cgi) and 
 [docker](https://docs.docker.com/install/).  Then run on the command line
