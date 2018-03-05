@@ -30,7 +30,7 @@ the ports available on the local machine
 
 ## Upcoming features
 
-* more comments and Javadocs
+* extend comments and Javadocs
 * a more seemless handling of data-driven tests
 * integration with AWS
 * integration with Jenkins
