@@ -66,8 +66,8 @@ The service presented here
 corrects this problem by using the alternate formula whenever the prior
 formula returns zero.  
 
-Matlab gets this wrong!  To see this, try the matlab function 
-```exppdf(x, 1/lambda)``` for the 
+Matlab gets this wrong!  To see this, try the [matlab function 
+```exppdf(x, 1/lambda)```](https://www.mathworks.com/help/stats/exppdf.html) for the 
 above example and see that it incorrectly returns zero where a non-zero
 answer is correct.  (Note that Matlab defines ```lambda``` as the reciprical of
 our ```lambda```; otherwise the formula is identical.)
@@ -82,14 +82,14 @@ needed.
 The following operations are defined in this package as a part of the 
 Build Lifecyle:
 
-* test:  run unit tests
-* compile:  build the code
-* prepare-package:  select unused ports on the local machine to be used
+* **test**:  run unit tests
+* **compile**:  build the code
+* **prepare-package**:  select unused ports on the local machine to be used
 later for running the service.
-* package:  
-** build the .jar file for the code
-** place the port numbers into files that will use them later
-* pre-integration-test:  run ```docker-compose up``` on the Service
-* integration-test:  run the integration tests
-* post-integration-test:  run ```docker-compose down``` on the Service
-* verify:  verify that the integration tests passed
+* **package**:  
+  * build the .jar file for the code
+  * place the port numbers into files that will use them later
+* **pre-integration-test**:  run ```docker-compose up``` on the Service
+* **integration-test**:  run the integration tests
+* **post-integration-test**:  run ```docker-compose down``` on the Service
+* **verify**:  verify that the integration tests passed
