@@ -40,10 +40,11 @@ the ports available on the local machine
 
 ### The Service
 
-The service takes advantage of the Web API framework provided by [Dropwizard]().
+The service takes advantage of the Web API framework provided by 
+[Dropwizard](http://www.dropwizard.io/1.2.2/docs/).
 It exposes one endpoint, ```/distribution/exponential/pdf```, which 
 computes the 
-[probability density function of the exponential distribution]().
+[probability density function of the exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution).
 This problem has a particular computational vagary that the program
 attempts to fix.  
 
@@ -71,7 +72,7 @@ above example and see that it incorrectly returns zero where a non-zero
 answer is correct.  (Note that Matlab defines ```lambda``` as the reciprical of
 our ```lambda```; otherwise the formula is identical.)
 
-### The [Maven Build Lifecycle]()
+### The [Maven Build Lifecycle](http://maven.apache.org/ref/3.5.0/maven-core/lifecycles.html)
 
 This Java project uses Maven to compile and run tests and one may define
 various operations as part of the build process in the ```pom.xml``` file.  
@@ -81,8 +82,8 @@ needed.
 The following operations are defined in this package as a part of the 
 Build Lifecyle:
 
-* compile:  build the code
 * test:  run unit tests
+* compile:  build the code
 * prepare-package:  select unused ports on the local machine to be used
 later for running the service.
 * package:  
