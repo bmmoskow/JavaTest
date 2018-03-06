@@ -21,16 +21,16 @@ This project demonstrates
 * a basic web API service, programmatically using the Dropwizard API, 
 demonstrating a simple computational numerics problem
 * usage of the Maven lifecycle to build and test a service
-* unit tests against the web service
-* usage of data-driven tests
+* unit tests against the web service using TestNG
+* usage of data-driven tests using TestNG
 * deployment of the service on a Docker container
 * assignment of ports for the service according to
 the ports available on the local machine
-* integration tests against the service
+* integration tests against the service using TestNG
 
 ## Upcoming features
 
-* extend comments and Javadocs
+* extended comments and Javadocs
 * a more seemless handling of data-driven tests
 * integration with AWS
 * integration with Jenkins
@@ -42,7 +42,7 @@ the ports available on the local machine
 
 The service takes advantage of the Web API framework provided by 
 [Dropwizard](http://www.dropwizard.io/1.2.2/docs/).
-It exposes one endpoint, ```/distribution/exponential/pdf```, which 
+It exposes one POST endpoint, ```/distribution/exponential/pdf```, which 
 computes the 
 [probability density function of the exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution).
 This problem has a particular computational vagary that the program
@@ -55,13 +55,12 @@ double precision.
 The formula also has a spurious underflow where ```exp(-lambda*x)``` 
 underflows but ```lambda*exp(-lambda*x)``` is still above 
 the underflow level.  
-In this case, the exponential term (which underflows) 
+In this case, when the exponential term underflows, it 
 will multiply ```lambda``` and compute to zero.
-
+An example of this spurious zero is ```lambda = x = 27.3```. 
 To fix this issue, one needs to instead try the alternate but equivalent
 formula ```exp(log(lambda) - lambda*x)```.
 
-An example of this spurious zero is ```lambda = x = 27.3```.  
 The service presented here
 corrects this problem by using the alternate formula whenever the prior
 formula returns zero.  
