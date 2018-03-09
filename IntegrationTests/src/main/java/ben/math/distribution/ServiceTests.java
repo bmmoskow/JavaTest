@@ -33,17 +33,20 @@ public class ServiceTests {
     private static int servicePort;
     private static int serviceHealthPort;
     private static String distributionPdfUrl;
-    private static String bucketName = "ben51-test-bucket";
-    private static String prefix = "pdfData";
+    private static String awsBucketName = "ben51-test-bucket";
+    private static String awsS3DataLocation = "pdfData";
 
     @BeforeClass
-    @Parameters({"servicePath", "servicePort", "serviceHealthPort"})
-    public static void beforeClass(String servicePath, int servicePort, int serviceHealthPort) throws UnirestException, InterruptedException {
+    @Parameters({"servicePath", "servicePort", "serviceHealthPort", "awsBucketName", "awsS3DataLocation"})
+    public static void beforeClass(String servicePath, int servicePort, int serviceHealthPort,
+                                   String awsBucketName, String awsS3DataLocation) throws UnirestException, InterruptedException {
         Unirest.setDefaultHeader("CONTENT-TYPE", "application/json");
 
         ServiceTests.servicePath = servicePath;
         ServiceTests.servicePort = servicePort;
         ServiceTests.serviceHealthPort = serviceHealthPort;
+        ServiceTests.awsBucketName = awsBucketName;
+        ServiceTests.awsS3DataLocation = awsS3DataLocation;
         distributionPdfUrl = servicePath + ":" + servicePort + "/distribution/exponential/pdf";
 
         checkServiceRunning();
@@ -95,7 +98,7 @@ public class ServiceTests {
 
         AmazonS3 s3 = new AmazonS3Client(new ProfileCredentialsProvider());
 
-        ObjectListing listing = s3.listObjects( bucketName, prefix );
+        ObjectListing listing = s3.listObjects(awsBucketName, awsS3DataLocation);
         List<S3ObjectSummary> summaries = listing.getObjectSummaries();
 
         Object[][] pdfDataObject = new Object[summaries.size()][3];
@@ -112,7 +115,7 @@ public class ServiceTests {
     }
 
     private static String s3ObjectToString(AmazonS3 s3, S3ObjectSummary summary) throws IOException {
-        S3Object s3object = s3.getObject(new GetObjectRequest(bucketName, summary.getKey()));
+        S3Object s3object = s3.getObject(new GetObjectRequest(awsBucketName, summary.getKey()));
         BufferedReader reader = new BufferedReader(new InputStreamReader(s3object.getObjectContent()));
         String line;
         StringBuilder sb = new StringBuilder();
