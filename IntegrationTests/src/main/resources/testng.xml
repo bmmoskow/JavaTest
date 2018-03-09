@@ -5,6 +5,7 @@
     <parameter name="serviceHealthPort" value="%SERVICE_HEALTH_PORT%" />
     <parameter name="awsBucketName" value="ben51-test-bucket" />
     <parameter name="awsS3DataLocation" value="pdfData" />
+    <parameter name="awsS3DataLocationTemp" value="pdfDataTemp" />
     <test name="Regression suite 1" >
         <classes>
             <class name="ben.math.distribution.ServiceTests"/>

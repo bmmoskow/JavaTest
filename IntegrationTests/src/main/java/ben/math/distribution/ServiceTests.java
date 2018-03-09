@@ -33,13 +33,16 @@ public class ServiceTests {
     private static int servicePort;
     private static int serviceHealthPort;
     private static String distributionPdfUrl;
-    private static String awsBucketName = "ben51-test-bucket";
-    private static String awsS3DataLocation = "pdfData";
+    private static String awsBucketName;
+    private static String awsS3DataLocation;
+    private static String awsS3DataLocationTemp;
+
+    private static AmazonS3 s3;
 
     @BeforeClass
-    @Parameters({"servicePath", "servicePort", "serviceHealthPort", "awsBucketName", "awsS3DataLocation"})
+    @Parameters({"servicePath", "servicePort", "serviceHealthPort", "awsBucketName", "awsS3DataLocation", "awsS3DataLocationTemp"})
     public static void beforeClass(String servicePath, int servicePort, int serviceHealthPort,
-                                   String awsBucketName, String awsS3DataLocation) throws UnirestException, InterruptedException {
+                                   String awsBucketName, String awsS3DataLocation, String awsS3DataLocationTemp) throws UnirestException, InterruptedException {
         Unirest.setDefaultHeader("CONTENT-TYPE", "application/json");
 
         ServiceTests.servicePath = servicePath;
@@ -47,9 +50,19 @@ public class ServiceTests {
         ServiceTests.serviceHealthPort = serviceHealthPort;
         ServiceTests.awsBucketName = awsBucketName;
         ServiceTests.awsS3DataLocation = awsS3DataLocation;
+        ServiceTests.awsS3DataLocationTemp = awsS3DataLocationTemp;
         distributionPdfUrl = servicePath + ":" + servicePort + "/distribution/exponential/pdf";
 
         checkServiceRunning();
+
+        s3 = new AmazonS3Client(new ProfileCredentialsProvider());
+        ObjectListing listing = s3.listObjects(awsBucketName, ServiceTests.awsS3DataLocation);
+        List<S3ObjectSummary> summaries = listing.getObjectSummaries();
+        for (S3ObjectSummary summary : summaries) {
+            String sourceKey = summary.getKey();
+            String destinationKey = ServiceTests.awsS3DataLocationTemp + sourceKey.substring(0, ServiceTests.awsS3DataLocation.length()-1);
+            s3.copyObject(awsBucketName, sourceKey, awsBucketName, destinationKey);
+        }
     }
 
     private static void checkServiceRunning() throws UnirestException, InterruptedException {
@@ -76,6 +89,12 @@ public class ServiceTests {
     @AfterClass
     public static void afterClass() {
         Unirest.clearDefaultHeaders();
+
+        ObjectListing listing = s3.listObjects(awsBucketName, awsS3DataLocationTemp);
+        List<S3ObjectSummary> summaries = listing.getObjectSummaries();
+        for (S3ObjectSummary summary : summaries) {
+            s3.deleteObject(awsBucketName, summary.getKey());
+        }
     }
 
     @DataProvider(name = "pdfData")
@@ -96,9 +115,7 @@ public class ServiceTests {
     @DataProvider(name = "pdfDataAws")
     public static Object[][] pdfDataProviderAws() throws IOException {
 
-        AmazonS3 s3 = new AmazonS3Client(new ProfileCredentialsProvider());
-
-        ObjectListing listing = s3.listObjects(awsBucketName, awsS3DataLocation);
+        ObjectListing listing = s3.listObjects(awsBucketName, awsS3DataLocationTemp);
         List<S3ObjectSummary> summaries = listing.getObjectSummaries();
 
         Object[][] pdfDataObject = new Object[summaries.size()][3];
