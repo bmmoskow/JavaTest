@@ -50,13 +50,13 @@ public class ServiceTests {
         ServiceTests.awsS3DataLocationTemp = awsS3DataLocationTemp;
         distributionPdfUrl = servicePath + ":" + servicePort + "/distribution/exponential/pdf";
 
-        checkServiceRunning();
         copyTestDataToTempLocation();
+        checkServiceRunning();
     }
 
     private static void copyTestDataToTempLocation() {
         for (String sourceKey : listS3ObjectKeys(awsS3DataLocation)) {
-            String destinationKey = awsS3DataLocationTemp + sourceKey.substring(awsS3DataLocation.length()-1);
+            String destinationKey = awsS3DataLocationTemp + sourceKey.substring(awsS3DataLocation.length());
             s3.copyObject(awsBucketName, sourceKey, awsBucketName, destinationKey);
         }
     }
