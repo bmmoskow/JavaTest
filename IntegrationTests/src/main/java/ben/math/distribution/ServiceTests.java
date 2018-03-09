@@ -17,10 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.mashape.unirest.http.HttpResponse;
 
@@ -37,7 +34,7 @@ public class ServiceTests {
     private static String awsS3DataLocation;
     private static String awsS3DataLocationTemp;
 
-    private static AmazonS3 s3;
+    private static AmazonS3 s3 = new AmazonS3Client(new ProfileCredentialsProvider());;
 
     @BeforeClass
     @Parameters({"servicePath", "servicePort", "serviceHealthPort", "awsBucketName", "awsS3DataLocation", "awsS3DataLocationTemp"})
@@ -54,15 +51,24 @@ public class ServiceTests {
         distributionPdfUrl = servicePath + ":" + servicePort + "/distribution/exponential/pdf";
 
         checkServiceRunning();
+        copyTestDataToTempLocation();
+    }
 
-        s3 = new AmazonS3Client(new ProfileCredentialsProvider());
-        ObjectListing listing = s3.listObjects(awsBucketName, ServiceTests.awsS3DataLocation);
-        List<S3ObjectSummary> summaries = listing.getObjectSummaries();
-        for (S3ObjectSummary summary : summaries) {
-            String sourceKey = summary.getKey();
-            String destinationKey = ServiceTests.awsS3DataLocationTemp + sourceKey.substring(0, ServiceTests.awsS3DataLocation.length()-1);
+    private static void copyTestDataToTempLocation() {
+        for (String sourceKey : listS3ObjectKeys(awsS3DataLocation)) {
+            String destinationKey = awsS3DataLocationTemp + sourceKey.substring(awsS3DataLocation.length()-1);
             s3.copyObject(awsBucketName, sourceKey, awsBucketName, destinationKey);
         }
+    }
+
+    private static List<String> listS3ObjectKeys(String awsS3DataLocation) {
+        List<S3ObjectSummary> summaries = s3.listObjects(awsBucketName, awsS3DataLocation).getObjectSummaries();
+        List<String> keys = new LinkedList();
+        for (S3ObjectSummary summary : summaries) {
+            keys.add(summary.getKey());
+        }
+
+        return keys;
     }
 
     private static void checkServiceRunning() throws UnirestException, InterruptedException {
@@ -89,11 +95,12 @@ public class ServiceTests {
     @AfterClass
     public static void afterClass() {
         Unirest.clearDefaultHeaders();
+        deleteTempDataLocation();
+    }
 
-        ObjectListing listing = s3.listObjects(awsBucketName, awsS3DataLocationTemp);
-        List<S3ObjectSummary> summaries = listing.getObjectSummaries();
-        for (S3ObjectSummary summary : summaries) {
-            s3.deleteObject(awsBucketName, summary.getKey());
+    private static void deleteTempDataLocation() {
+        for (String key : listS3ObjectKeys(awsS3DataLocationTemp)) {
+            s3.deleteObject(awsBucketName, key);
         }
     }
 
@@ -115,13 +122,12 @@ public class ServiceTests {
     @DataProvider(name = "pdfDataAws")
     public static Object[][] pdfDataProviderAws() throws IOException {
 
-        ObjectListing listing = s3.listObjects(awsBucketName, awsS3DataLocationTemp);
-        List<S3ObjectSummary> summaries = listing.getObjectSummaries();
+        List<String> keys = listS3ObjectKeys(awsS3DataLocationTemp);
 
-        Object[][] pdfDataObject = new Object[summaries.size()][3];
+        Object[][] pdfDataObject = new Object[keys.size()][3];
         int i = 0;
-        for (S3ObjectSummary summary : summaries) {
-            Map<String, Object> pdfData = mapper.readValue(s3ObjectToString(s3, summary), HashMap.class);
+        for (String key : keys) {
+            Map<String, Object> pdfData = mapper.readValue(s3ObjectToString(s3, key), HashMap.class);
             pdfDataObject[i][0] = pdfData.get("lambda");
             pdfDataObject[i][1] = pdfData.get("x");
             pdfDataObject[i][2] = pdfData.get("pdf");
@@ -131,13 +137,17 @@ public class ServiceTests {
         return pdfDataObject;
     }
 
-    private static String s3ObjectToString(AmazonS3 s3, S3ObjectSummary summary) throws IOException {
-        S3Object s3object = s3.getObject(new GetObjectRequest(awsBucketName, summary.getKey()));
+    private static String s3ObjectToString(AmazonS3 s3, String key) throws IOException {
+        S3Object s3object = s3.getObject(new GetObjectRequest(awsBucketName, key));
         BufferedReader reader = new BufferedReader(new InputStreamReader(s3object.getObjectContent()));
-        String line;
         StringBuilder sb = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } finally {
+            reader.close();
         }
         return sb.toString();
     }
