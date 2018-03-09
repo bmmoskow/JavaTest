@@ -1,13 +1,22 @@
 package ben.math.distribution;
 
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +33,8 @@ public class ServiceTests {
     private static int servicePort;
     private static int serviceHealthPort;
     private static String distributionPdfUrl;
+    private static String bucketName = "ben51-test-bucket";
+    private static String prefix = "pdfData";
 
     @BeforeClass
     @Parameters({"servicePath", "servicePort", "serviceHealthPort"})
@@ -79,8 +90,46 @@ public class ServiceTests {
         return pdfDataObject;
     }
 
+    @DataProvider(name = "pdfDataAws")
+    public static Object[][] pdfDataProviderAws() throws IOException {
+
+        AmazonS3 s3 = new AmazonS3Client(new ProfileCredentialsProvider());
+
+        ObjectListing listing = s3.listObjects( bucketName, prefix );
+        List<S3ObjectSummary> summaries = listing.getObjectSummaries();
+
+        Object[][] pdfDataObject = new Object[summaries.size()][3];
+        int i = 0;
+        for (S3ObjectSummary summary : summaries) {
+            Map<String, Object> pdfData = mapper.readValue(s3ObjectToString(s3, summary), HashMap.class);
+            pdfDataObject[i][0] = pdfData.get("lambda");
+            pdfDataObject[i][1] = pdfData.get("x");
+            pdfDataObject[i][2] = pdfData.get("pdf");
+            i++;
+        }
+
+        return pdfDataObject;
+    }
+
+    private static String s3ObjectToString(AmazonS3 s3, S3ObjectSummary summary) throws IOException {
+        S3Object s3object = s3.getObject(new GetObjectRequest(bucketName, summary.getKey()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(s3object.getObjectContent()));
+        String line;
+        StringBuilder sb = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        return sb.toString();
+    }
+
+
     @Test(dataProvider = "pdfData")
     public void baseline(Double lambda, Double x, Double pdf) throws UnirestException, IOException {
+        validatePostiveCase(lambda, x, pdf);
+    }
+
+    @Test(dataProvider = "pdfDataAws")
+    public void baselineAws(Double lambda, Double x, Double pdf) throws UnirestException, IOException {
         validatePostiveCase(lambda, x, pdf);
     }
 
