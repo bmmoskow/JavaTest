@@ -5,14 +5,22 @@ framework for testing web APIs.  It is a work in
 progress.  This document explains the implemented
 features and outlines the planned updates.
 
+For questions, please email Ben at
+bmmoskow@amath.washington.edu
+
 ## Quick Start
 
 Prerequisites are [java](https://java.com/en/download/), 
-[maven](https://maven.apache.org/download.cgi) and 
-[docker](https://docs.docker.com/install/).  Then to build
+[maven](https://maven.apache.org/download.cgi), 
+[docker](https://docs.docker.com/install/) and 
+[aws](https://aws.amazon.com/).  Then to build
  and run tests, execute on the command line
 
 ```mvn clean verify```
+
+The integration tests are configured connect to an 
+AWS S3 bucket with public access.  Please contact me
+(contact info above) if you encounter any problems.
 
 ## Capabilities
 
@@ -23,6 +31,7 @@ demonstrating a simple computational numerics problem
 * usage of the Maven lifecycle to build and test a service
 * unit tests against the web service using TestNG
 * usage of data-driven tests using TestNG
+* acquiring test data from an AWS S3 bucket
 * deployment of the service on a Docker container
 * assignment of ports for the service according to
 the ports available on the local machine
@@ -32,9 +41,8 @@ the ports available on the local machine
 
 * extended comments and Javadocs
 * a more seemless handling of data-driven tests
-* integration with AWS
 * integration with Jenkins
-* use of Consul to maintain the configuration
+* use of DynamoDb to record history
 
 ## A Deeper Look
 
